@@ -25,6 +25,7 @@ class JobsPage(BasePage):
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[id*='Istanbul, Turkey']"))).click()
         actions.move_to_element(self.driver.find_element(*self.DEPARTMENT_FILTER)).click().perform()
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[id*='Quality Assurance']"))).click()
+        time.sleep(3)
 
     def are_jobs_present(self):
         return len(self.driver.find_elements(*self.JOB_LIST)) > 0
@@ -35,13 +36,26 @@ class JobsPage(BasePage):
             job_location = job.find_element(By.CSS_SELECTOR, "[class*='position-location']").text
             job_department = job.find_element(By.CSS_SELECTOR, "[class*='position-department']").text
             job_position = job.find_element(By.CSS_SELECTOR, "[class*='position-title']").text
+            print(f"Job location: {job_location}, Expected: {location}")
+            print(f"Job department: {job_department}, Expected: {department}")
+            print(f"Job department: {job_position}, Expected: {department}")
+
             if location not in job_location or department not in job_department or department not in job_position:
                 return False
         return True
 
     def view_first_job_role(self):
-        currentElement = self.driver.find_elements(*self.JOB_LIST)[0]
-        WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((currentElement.find_element(By.CLASS_NAME, "btn.btn-navy.rounded.pt-2.pr-5.pb-2.pl-5")))).click()
+        wait = WebDriverWait(self.driver, 15)
+        currentElemnt = self.driver.find_elements(*self.JOB_LIST)[0].find_element(By.XPATH, f"//*[@id='jobs-list']/div/div/a")
+
+        view_role_button = wait.until(EC.element_to_be_clickable((currentElemnt)))
+        print(view_role_button.text)
+        actions = ActionChains(self.driver)
+        actions.move_to_element(view_role_button).perform()
+        view_role_button.click()
+
+        wait.until(EC.url_contains("https://jobs.lever.co/useinsider/78ddbec0-16bf-4eab-b5a6-04facb993ddc"))
+        assert "lever.co" in self.driver.current_url, "Not redirected to Lever Application form page"
 
     def go_to_qa_jobs(self):
         self.driver.find_element(*self.QA_JOBS_BUTTON).click()
