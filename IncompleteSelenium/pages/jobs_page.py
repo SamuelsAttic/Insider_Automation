@@ -5,8 +5,14 @@ class JobsPage(BasePage):
     LOCATION_FILTER = (By.ID, "filter-by-location")
     DEPARTMENT_FILTER = (By.ID, "filter-by-department")
     JOB_LIST = (By.CLASS_NAME, "position-list-item")
+    QA_JOBS_BUTTON = (By.CLASS_NAME, "btn.btn-outline-secondary.rounded.text-medium.mt-2.py-3.px-lg-5.w-100.w-md-50")
+
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.driver.get("https://useinsider.com/careers/quality-assurance/")
 
     def filter_jobs(self, location="Istanbul, Turkey", department="Quality Assurance"):
+        self.driver.find_element(By.ID, "wt-cli-accept-all-btn").click()
         self.driver.find_element(*self.LOCATION_FILTER).click()
         self.driver.find_element(By.XPATH, f"//span[text()='{location}']").click()
 
@@ -28,3 +34,6 @@ class JobsPage(BasePage):
 
     def view_first_job_role(self):
         self.driver.find_elements(*self.JOB_LIST)[0].find_element(By.LINK_TEXT, "View Role").click()
+
+    def go_to_qa_jobs(self):
+        self.driver.find_element(*self.QA_JOBS_BUTTON).click()
